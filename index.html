@@ -1,0 +1,357 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Fichas QR</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Layout: uma coluna estreita (640px) como a etiqueta de uma caixa de feira: ficha grande, quantidades em destaque à direita */
+:root{
+  --bg:#f2f5ee; --surface:#ffffff; --ink:#10261e; --muted:#566b60; --line:#d6dfd0;
+  --accent:#f2c230; --on-accent:#10261e; --leaf:#1d6a4d; --danger:#b3261e;
+  --c1:#f2c230; --c2:#86cfa6; --c3:#f29a5c; --c4:#8db9ea;
+  --font-display:'Bricolage Grotesque','Avenir Next',system-ui,sans-serif;
+  --font-body:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0c1813; --surface:#13241c; --ink:#eaf2e6; --muted:#9bb0a3; --line:#264034; --leaf:#5cc19a; --danger:#ff8a80;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0c1813; --surface:#13241c; --ink:#eaf2e6; --muted:#9bb0a3; --line:#264034; --leaf:#5cc19a; --danger:#ff8a80;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{
+  background:var(--bg); color:var(--ink); font-family:var(--font-body); font-size:16px; line-height:1.5;
+  padding-block:20px 56px;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));
+  padding-right:max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap{max-width:640px; margin-inline:auto; display:flex; flex-direction:column; gap:24px}
+h1,h2{font-family:var(--font-display); margin:0; text-wrap:balance; line-height:1.1}
+h1{font-size:clamp(2rem,7vw,2.75rem); font-weight:700; letter-spacing:-0.02em}
+h2{font-size:1.3rem; font-weight:700}
+p{margin:0}
+button,input,select{font:inherit; color:inherit}
+:focus-visible{outline:3px solid var(--leaf); outline-offset:2px}
+
+.bar{display:flex; align-items:center; justify-content:space-between; gap:12px}
+.brand{display:flex; align-items:center; gap:10px; background:none; border:0; padding:6px 0; cursor:pointer; font-family:var(--font-display); font-weight:700; font-size:1.15rem}
+.brand svg{width:28px; height:28px; flex:none}
+.back{background:none; border:0; padding:8px 0; cursor:pointer; color:var(--leaf); font-weight:600; min-height:44px; text-align:left}
+
+.intro{display:flex; flex-direction:column; gap:10px}
+.intro p{color:var(--muted); max-width:52ch}
+
+.card{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:20px 16px; display:flex; flex-direction:column; gap:16px; min-width:0}
+label{font-size:.8rem; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--muted)}
+input,select{
+  width:100%; min-height:46px; padding:8px 12px; border-radius:10px; border:1.5px solid var(--line);
+  background:var(--bg); font-size:16px; min-width:0;
+}
+input:focus,select:focus{border-color:var(--leaf); outline:none; box-shadow:0 0 0 3px color-mix(in srgb, var(--leaf) 28%, transparent)}
+.field{display:flex; flex-direction:column; gap:6px}
+.rows{display:flex; flex-direction:column; gap:10px}
+.row{display:grid; grid-template-columns:minmax(0,1fr) 6rem 4.5rem 2.75rem; gap:8px; align-items:center}
+.r-qty{text-align:right; font-variant-numeric:tabular-nums}
+.icon{width:44px; height:44px; border-radius:10px; border:1.5px solid var(--line); background:none; cursor:pointer; font-size:1.3rem; line-height:1; color:var(--muted)}
+.icon:disabled{opacity:.35; cursor:default}
+@media (max-width:520px){
+  .row{grid-template-columns:minmax(0,1fr) 5rem 2.75rem}
+  .r-name{grid-column:1 / -1}
+  .rows{gap:14px}
+}
+.actions{display:flex; flex-wrap:wrap; gap:10px}
+.btn{min-height:48px; padding:0 20px; border-radius:12px; border:1.5px solid var(--line); background:none; cursor:pointer; font-weight:600}
+.btn.primary{background:var(--accent); color:var(--on-accent); border-color:var(--accent); font-family:var(--font-display); font-size:1.05rem}
+.btn.primary:disabled{opacity:.6; cursor:default}
+.btn.warn{border-color:var(--danger); color:var(--danger)}
+.btn.ghost{color:var(--leaf); border-style:dashed}
+
+.list{list-style:none; margin:0; padding:0; display:grid; gap:10px}
+.fcard{width:100%; text-align:left; background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:14px 16px; cursor:pointer; display:flex; flex-direction:column; gap:4px}
+.fcard:hover{border-color:var(--leaf)}
+.fcard b{font-family:var(--font-display); font-size:1.15rem}
+.fcard span{color:var(--muted); font-size:.92rem; overflow-wrap:anywhere}
+#listArea{display:flex; flex-direction:column; gap:12px}
+.note,.empty{color:var(--muted); padding:16px; border:1px dashed var(--line); border-radius:12px}
+.skel{height:64px; border-radius:12px; background:var(--line); opacity:.5}
+
+.sheet{background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:24px 20px; display:flex; flex-direction:column; gap:20px; min-width:0}
+.kicker{font-size:.78rem; font-weight:600; letter-spacing:.12em; text-transform:uppercase; color:var(--leaf)}
+.items{list-style:none; margin:0; padding:0; display:flex; flex-direction:column}
+.item{padding:16px 0; border-top:1px solid var(--line); display:flex; flex-direction:column; gap:10px}
+.item:first-child{border-top:0; padding-top:4px}
+.item-top{display:flex; justify-content:space-between; align-items:baseline; gap:12px}
+.name{font-family:var(--font-display); font-weight:500; font-size:1.35rem; overflow-wrap:anywhere; min-width:0}
+.qty{white-space:nowrap; color:var(--muted); font-weight:600}
+.qty b{font-family:var(--font-display); font-size:2.1rem; font-weight:700; color:var(--ink); font-variant-numeric:tabular-nums; letter-spacing:-0.02em}
+.track{height:10px; border-radius:99px; background:var(--line); overflow:hidden}
+.track i{display:block; height:100%; width:var(--w); background:var(--c); border-radius:99px}
+.total{display:flex; justify-content:space-between; align-items:baseline; gap:12px; padding-top:16px; border-top:2px solid var(--ink)}
+.total span{font-size:.8rem; font-weight:600; letter-spacing:.1em; text-transform:uppercase}
+.total b{font-family:var(--font-display); font-size:1.5rem}
+.stamp{color:var(--muted); font-size:.85rem}
+
+.qrbox{display:flex; flex-wrap:wrap; gap:20px; align-items:center}
+.qrimg{width:200px; max-width:100%; flex:none; border-radius:12px; overflow:hidden; border:1px solid var(--line); background:#fff}
+.qrimg svg{display:block; width:100%; height:auto}
+.qrinfo{flex:1 1 200px; display:flex; flex-direction:column; gap:12px; min-width:0}
+.qrinfo p{color:var(--muted); font-size:.92rem}
+.link{font-family:ui-monospace,Menlo,Consolas,monospace; font-size:.78rem; overflow-wrap:anywhere; user-select:all; color:var(--muted)}
+
+#toast{position:fixed; left:50%; transform:translateX(-50%); bottom:calc(20px + env(safe-area-inset-bottom, 0px)); background:var(--ink); color:var(--bg); padding:12px 18px; border-radius:12px; font-size:.95rem; max-width:min(90vw,420px); text-align:center; z-index:20}
+#toast[hidden]{display:none}
+@media (prefers-reduced-motion: no-preference){ .track i{transition:width .5s ease} }
+</style>
+
+<div class="wrap">
+  <header class="bar">
+    <button class="brand" id="brand" aria-label="Ir para o início">
+      <svg viewBox="0 0 28 28" aria-hidden="true"><rect width="28" height="28" rx="7" fill="#f2c230"/><path fill="#10261e" d="M5 5h8v8H5zM7 7v4h4V7zM15 5h8v8h-8zM17 7v4h4V7zM5 15h8v8H5zM7 17v4h4v-4zM15 15h3v3h-3zM20 15h3v3h-3zM17.5 18.5h3v3h-3zM15 20.5h2v2.5h-2zM21 20.5h2V23h-2z"/></svg>
+      Fichas QR
+    </button>
+  </header>
+  <main id="app"></main>
+</div>
+<div id="toast" role="status" hidden></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script>
+(function(){
+  var PORTAL_URL = "https://claude.ai/artifact/BbxbDF7HgXZPx6bbQkkDJY";
+  var UNITS = ["kg","g","un","cx","L"];
+  var app = document.getElementById("app");
+  var toastEl = document.getElementById("toast");
+  var db = null, dl = null, canWrite = true, ready = false, loaded = false, loadFailed = false, fichas = [];
+  var draft = newDraft(), toastTimer, confirmTimer, loadTimer, qrCache = null;
+
+  function newDraft(){ return {id:null, title:"", items:[{name:"", qty:"", unit:"kg"}]}; }
+  function $(s, r){ return (r || document).querySelector(s); }
+  function esc(s){ return String(s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+  function fmt(n){ return Number(n).toLocaleString("pt-BR", {maximumFractionDigits:2}); }
+  function rid(){
+    var a = "abcdefghjkmnpqrstuvwxyz23456789", s = "", b = crypto.getRandomValues(new Uint8Array(8));
+    for (var i = 0; i < b.length; i++) s += a[b[i] % a.length];
+    return s;
+  }
+  function parseQty(v){
+    var n = Number(String(v).trim().replace(",", "."));
+    return String(v).trim() !== "" && isFinite(n) && n >= 0 ? n : null;
+  }
+  function currentId(){ try { return decodeURIComponent(location.hash.slice(1)); } catch(e){ return ""; } }
+  function use(name){ return window.claude && window.claude.use ? window.claude.use(name) : Promise.resolve(null); }
+  function toast(msg){
+    toastEl.textContent = msg; toastEl.hidden = false;
+    clearTimeout(toastTimer); toastTimer = setTimeout(function(){ toastEl.hidden = true; }, 3200);
+  }
+  function errMsg(e){
+    var c = e && e.code;
+    if (c === "quota_exceeded") return "Limite de fichas atingido. Exclua fichas antigas.";
+    if (c === "invalid_argument") return "Você não tem permissão para alterar esta página.";
+    return "Não foi possível salvar. Tente de novo.";
+  }
+  function slug(t){
+    return (t || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "ficha";
+  }
+  function qrUrl(id){ return (PORTAL_URL || location.href.split("#")[0]) + "#" + id; }
+  function summary(f){
+    return (f.items || []).map(function(it){
+      return esc(it.name) + (it.qty == null ? "" : " " + fmt(it.qty) + " " + esc(it.unit));
+    }).join(" · ");
+  }
+
+  /* ---------- início ---------- */
+  function renderHome(){
+    app.innerHTML =
+      '<div class="intro"><h1>Fichas QR</h1><p>Cadastre o que está na caixa e gere o QR code. Ao escanear, a ficha abre pronta para ler, com as quantidades em destaque.</p></div>' +
+      '<section class="card" aria-labelledby="ed-h" style="margin-top:24px">' +
+        '<h2 id="ed-h">' + (draft.id ? "Editar ficha" : "Nova ficha") + '</h2>' +
+        '<div class="field"><label for="f-title">Nome da ficha</label><input id="f-title" placeholder="Ex.: Caixa 01" autocomplete="off" value="' + esc(draft.title) + '"></div>' +
+        '<div class="field"><label>Itens</label><div class="rows" id="rows"></div></div>' +
+        '<div><button class="btn ghost" id="add" type="button">+ Adicionar item</button></div>' +
+        '<div class="actions"><button class="btn primary" id="gen" type="button">' + (draft.id ? "Salvar alterações" : "Gerar QR code") + '</button>' +
+        (draft.id ? '<button class="btn" id="cancel" type="button">Cancelar</button>' : "") + '</div>' +
+      '</section>' +
+      '<section id="listArea" style="margin-top:24px"></section>';
+    renderRows();
+    renderList();
+    $("#f-title").addEventListener("input", function(e){ draft.title = e.target.value; });
+    $("#add").addEventListener("click", function(){ draft.items.push({name:"", qty:"", unit:"kg"}); renderRows(true); });
+    $("#gen").addEventListener("click", save);
+    var c = $("#cancel"); if (c) c.addEventListener("click", function(){ var id = draft.id; draft = newDraft(); location.hash = id; });
+    var rows = $("#rows");
+    rows.addEventListener("input", function(e){
+      var row = e.target.closest(".row"); if (!row) return;
+      var it = draft.items[+row.dataset.i];
+      if (e.target.classList.contains("r-name")) it.name = e.target.value;
+      else if (e.target.classList.contains("r-qty")) it.qty = e.target.value;
+      else if (e.target.classList.contains("r-unit")) it.unit = e.target.value;
+    });
+    rows.addEventListener("click", function(e){
+      var b = e.target.closest(".rm"); if (!b || draft.items.length < 2) return;
+      draft.items.splice(+b.closest(".row").dataset.i, 1); renderRows();
+    });
+  }
+  function renderRows(focusLast){
+    $("#rows").innerHTML = draft.items.map(function(it, i){
+      return '<div class="row" data-i="' + i + '">' +
+        '<input class="r-name" id="n' + i + '" aria-label="Nome do item ' + (i + 1) + '" placeholder="Ex.: Banana nanica" autocomplete="off" value="' + esc(it.name) + '">' +
+        '<input class="r-qty" id="q' + i + '" inputmode="decimal" aria-label="Quantidade do item ' + (i + 1) + '" placeholder="0" autocomplete="off" value="' + esc(it.qty) + '">' +
+        '<select class="r-unit" id="u' + i + '" aria-label="Unidade do item ' + (i + 1) + '">' +
+          UNITS.map(function(u){ return '<option' + (u === it.unit ? " selected" : "") + '>' + u + '</option>'; }).join("") +
+        '</select>' +
+        '<button class="icon rm" type="button" aria-label="Remover item ' + (i + 1) + '"' + (draft.items.length < 2 ? " disabled" : "") + '>×</button>' +
+      '</div>';
+    }).join("");
+    if (focusLast) { var el = $("#n" + (draft.items.length - 1)); if (el) el.focus(); }
+  }
+  function renderList(){
+    var el = $("#listArea"); if (!el) return;
+    var body;
+    if (!ready) body = '<div class="skel"></div>';
+    else if (!db) body = '<p class="note">Entre na sua conta do Claude para salvar e abrir suas fichas.</p>';
+    else if (!loaded) body = loadFailed ? '<p class="note">Não foi possível carregar as fichas agora. Se a conexão voltar, elas aparecem aqui.</p>' : '<div class="skel"></div><div class="skel"></div>';
+    else if (!fichas.length) body = '<p class="empty">Nenhuma ficha ainda. Preencha o formulário e toque em Gerar QR code.</p>';
+    else body = '<ul class="list">' + fichas.map(function(f){
+      return '<li><button class="fcard" type="button" data-id="' + esc(f.id) + '"><b>' + esc(f.title || "Ficha sem nome") + '</b><span>' + summary(f) + '</span></button></li>';
+    }).join("") + '</ul>';
+    el.innerHTML = '<h2>Suas fichas</h2>' + body;
+  }
+
+  async function save(){
+    if (!db) { toast("Entre na sua conta do Claude para salvar."); return; }
+    if (!canWrite) { toast("Você só pode ver esta página, não criar fichas."); return; }
+    var items = draft.items.map(function(it){ return {name:it.name.trim(), qty:parseQty(it.qty), unit:it.unit}; }).filter(function(it){ return it.name; });
+    if (!items.length) { toast("Adicione pelo menos um item com nome."); var n0 = $("#n0"); if (n0) n0.focus(); return; }
+    var id = draft.id || rid(), btn = $("#gen");
+    btn.disabled = true;
+    try {
+      await db.doc("fichas/" + id).set({title: draft.title.trim() || "Ficha sem nome", items: items, updatedAt: Date.now()});
+      draft = newDraft(); location.hash = id;
+    } catch(e){ toast(errMsg(e)); }
+    btn.disabled = false;
+  }
+
+  /* ---------- ficha ---------- */
+  function qrData(text){
+    if (typeof qrcode !== "function") return null;
+    try { var q = qrcode(0, "M"); q.addData(text); q.make(); return q; } catch(e){ return null; }
+  }
+  function qrSvg(q){
+    var n = q.getModuleCount(), d = "";
+    for (var r = 0; r < n; r++) for (var c = 0; c < n; c++) if (q.isDark(r, c)) d += "M" + (c + 4) + " " + (r + 4) + "h1v1h-1z";
+    return '<svg viewBox="0 0 ' + (n + 8) + ' ' + (n + 8) + '" role="img" aria-label="QR code da ficha"><rect width="100%" height="100%" fill="#fff"/><path d="' + d + '" fill="#000" shape-rendering="crispEdges"/></svg>';
+  }
+  function renderDetail(id){
+    var f = fichas.filter(function(x){ return x.id === id; })[0], inner;
+    if (!ready || (!f && !loaded && db)) inner = loadFailed ? '<p class="note">Não foi possível carregar a ficha agora.</p>' : '<div class="skel" style="height:240px"></div>';
+    else if (!db) inner = '<p class="note">Entre na sua conta do Claude para abrir esta ficha.</p>';
+    else if (!f) inner = '<p class="empty">Ficha não encontrada. Ela pode ter sido excluída.</p>';
+    else inner = sheetHtml(f);
+    app.innerHTML = '<button class="back" id="back" type="button">← Todas as fichas</button><div style="display:flex;flex-direction:column;gap:20px">' + inner + '</div>';
+    $("#back").addEventListener("click", function(){ location.hash = ""; });
+    if (f && db) bindDetail(f);
+  }
+  function sheetHtml(f){
+    var items = f.items || [], max = {}, totals = {}, order = [];
+    items.forEach(function(it){
+      if (it.qty == null) return;
+      max[it.unit] = Math.max(max[it.unit] || 0, it.qty);
+      if (!(it.unit in totals)) { totals[it.unit] = 0; order.push(it.unit); }
+      totals[it.unit] += it.qty;
+    });
+    var lis = items.map(function(it, i){
+      var pct = it.qty && max[it.unit] ? Math.max(6, Math.round(it.qty / max[it.unit] * 100)) : 0;
+      return '<li class="item" style="--c:var(--c' + (i % 4 + 1) + ');--w:' + pct + '%"><div class="item-top"><span class="name">' + esc(it.name) + '</span>' +
+        '<span class="qty"><b>' + (it.qty == null ? "—" : fmt(it.qty)) + '</b> ' + (it.qty == null ? "" : esc(it.unit)) + '</span></div>' +
+        '<div class="track" aria-hidden="true"><i></i></div></li>';
+    }).join("");
+    var tot = order.map(function(u){ return fmt(totals[u]) + " " + esc(u); }).join(" · ");
+    var when = f.updatedAt ? new Date(f.updatedAt).toLocaleString("pt-BR", {dateStyle:"short", timeStyle:"short"}) : "";
+    var url = qrUrl(f.id), q = qrData(url);
+    qrCache = q ? {q: q, title: f.title, id: f.id} : null;
+    var edit = canWrite ? '<div class="actions"><button class="btn" id="edit" type="button">Editar ficha</button><button class="btn warn" id="del" type="button">Excluir</button></div>' : "";
+    return '<article class="sheet"><p class="kicker">Ficha de conteúdo</p><h1>' + esc(f.title || "Ficha sem nome") + '</h1>' +
+      '<ul class="items">' + lis + '</ul>' +
+      (tot ? '<div class="total"><span>Total</span><b>' + tot + '</b></div>' : "") +
+      (when ? '<p class="stamp">Atualizado em ' + when + '</p>' : "") + '</article>' +
+      '<section class="card" aria-labelledby="qr-h"><h2 id="qr-h">QR code desta ficha</h2><div class="qrbox">' +
+        '<div class="qrimg">' + (q ? qrSvg(q) : "") + '</div><div class="qrinfo">' +
+          '<p>Cole na caixa. Se você editar a ficha, o mesmo QR passa a mostrar os dados novos.</p>' +
+          '<div class="actions">' + (q && dl ? '<button class="btn primary" id="png" type="button">Baixar imagem</button>' : "") + '<button class="btn" id="copy" type="button">Copiar link</button></div>' +
+          '<p class="link">' + esc(url) + '</p></div></div></section>' + edit;
+  }
+  function bindDetail(f){
+    var png = $("#png"), copy = $("#copy"), edit = $("#edit"), del = $("#del");
+    if (png) png.addEventListener("click", downloadPng);
+    if (copy) copy.addEventListener("click", function(){
+      var url = qrUrl(f.id);
+      (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject()).then(function(){ toast("Link copiado."); }, function(){
+        var l = $(".link"); if (l) { var r = document.createRange(); r.selectNodeContents(l); var s = getSelection(); s.removeAllRanges(); s.addRange(r); }
+        toast("Selecione o link e copie.");
+      });
+    });
+    if (edit) edit.addEventListener("click", function(){
+      draft = {id:f.id, title:f.title || "", items:(f.items || []).map(function(it){ return {name:it.name, qty:it.qty == null ? "" : String(it.qty).replace(".", ","), unit:it.unit}; })};
+      if (!draft.items.length) draft.items.push({name:"", qty:"", unit:"kg"});
+      location.hash = "";
+    });
+    if (del) del.addEventListener("click", async function(){
+      if (!del.dataset.sure) {
+        del.dataset.sure = "1"; del.textContent = "Toque de novo para excluir";
+        clearTimeout(confirmTimer); confirmTimer = setTimeout(function(){ del.dataset.sure = ""; del.textContent = "Excluir"; }, 4000);
+        return;
+      }
+      try { await db.doc("fichas/" + f.id).delete(); toast("Ficha excluída."); location.hash = ""; } catch(e){ toast(errMsg(e)); }
+    });
+  }
+  async function downloadPng(){
+    if (!qrCache || !dl) return;
+    var q = qrCache.q, n = q.getModuleCount(), m = 14, quiet = 4, W = (n + quiet * 2) * m, H = W + 96;
+    var cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+    var ctx = cv.getContext("2d");
+    ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = "#000";
+    for (var r = 0; r < n; r++) for (var c = 0; c < n; c++) if (q.isDark(r, c)) ctx.fillRect((c + quiet) * m, (r + quiet) * m, m, m);
+    var size = 40, title = qrCache.title || "Ficha";
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    do { ctx.font = "700 " + size + "px sans-serif"; size -= 2; } while (ctx.measureText(title).width > W - 48 && size > 14);
+    ctx.fillText(title, W / 2, W + 20);
+    var blob = await new Promise(function(res){ cv.toBlob(res, "image/png"); });
+    try { await dl.save({filename: slug(title) + "-qr.png", data: blob}); }
+    catch(e){ if (!e || e.code !== "declined") toast("Não foi possível baixar a imagem aqui."); }
+  }
+
+  /* ---------- rotas e dados ---------- */
+  function render(){ var id = currentId(); if (id) renderDetail(id); else renderHome(); }
+  function refresh(){ var id = currentId(); if (id) renderDetail(id); else renderList(); }
+  window.addEventListener("hashchange", function(){ render(); window.scrollTo(0, 0); });
+  document.getElementById("brand").addEventListener("click", function(){ if (currentId()) location.hash = ""; });
+  app.addEventListener("click", function(e){
+    var b = e.target.closest(".fcard"); if (b) location.hash = b.dataset.id;
+  });
+
+  function subscribe(){
+    loadTimer = setTimeout(function(){ if (!loaded) { loadFailed = true; refresh(); } }, 10000);
+    db.collection("fichas").orderBy("updatedAt", "desc").limit(200).onSnapshot(function(snap){
+      fichas = snap.docs.map(function(d){ var o = d.data() || {}; o.id = d.id; return o; });
+      if (!snap.metadata.fromCache) { loaded = true; loadFailed = false; clearTimeout(loadTimer); }
+      refresh();
+    }, function(){ loadFailed = true; loaded = false; refresh(); });
+  }
+
+  render();
+  (async function(){
+    try { db = await use("db"); } catch(e){ db = null; }
+    try { var u = await use("user"); if (u && (await u.can("data.write")) === false) canWrite = false; } catch(e){}
+    try { dl = await use("downloads"); } catch(e){ dl = null; }
+    ready = true;
+    if (db) subscribe();
+    refresh();
+  })();
+})();
+</script>
+
+</body></html>
